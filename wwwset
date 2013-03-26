@@ -1,0 +1,15 @@
+#!/bin/bash
+# Usage: Resymlink /var/www to the specified directory
+WWW=/var/www
+DIR=$(readlink -f "$1")
+
+if [ ! -h "$WWW" ]; then
+	echo "$WWW is not a Symlink! Aborting"
+	exit 1
+fi
+if [ ! -d "$DIR" ]; then
+	echo "$DIR is not a directory to link to $WWW"
+	exit 1
+fi
+sudo rm "$WWW"
+sudo ln -s "$DIR" "$WWW"
