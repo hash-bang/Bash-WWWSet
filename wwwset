@@ -4,8 +4,13 @@ WWW=/var/www
 DIR=$(readlink -f "$1")
 
 if [ ! -h "$WWW" ]; then
-	echo "$WWW is not a Symlink! Aborting"
-	exit 1
+	echo "$WWW is not a Symlink!"
+	echo
+	echo "This may just be because you have never run this script before - so its safe"
+	echo
+	echo "Press enter THREE TIMES if you want to continue - YOU WILL LOSE ANYTHING IN $WWW"
+	echo "Press Ctrl+C to abort"
+	read; read; read
 fi
 if [ ! -d "$DIR" ]; then
 	echo "$DIR is not a directory to link to $WWW"
