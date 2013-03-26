@@ -1,10 +1,40 @@
 #!/bin/bash
-# Usage: Resymlink /var/www to the specified directory
+# Resymlink the web root to a specified directory
+#
+# Usage: wwwset [dir]
+#
+# If no dir is specified the current directory is used
+
 WWW=/var/www
-DIR=$(readlink -f "$1")
+
+if [ "$#" == 0 ]; then
+	DIR="$PWD"
+elif [ -d "$1" ]; then
+	DIR="$1"
+else
+	echo "$DIR is not a directory to link to $WWW"
+	exit 1
+fi
+
+# Resolve $DIR to its absolute name
+cd `dirname $DIR`
+TARGET=`basename $DIR`
+
+# Iterate down a (possible) chain of symlinks
+while [ -L "$TARGET" ]
+do
+    TARGET=`readlink $TARGET`
+    cd `dirname $TARGET`
+    TARGET=`basename $TARGET`
+done
+ 
+# Compute the canonicalized name by finding the physical path 
+# for the directory we're in and appending the target file.
+PHYS_DIR=`pwd -P`
+DIR=$PHYS_DIR/$TARGET
 
 if [ ! -h "$WWW" ]; then
-	echo "$WWW is not a Symlink!"
+	echo "$WWW is not already a Symlink!"
 	echo
 	echo "This may just be because you have never run this script before - so its safe"
 	echo
@@ -12,9 +42,7 @@ if [ ! -h "$WWW" ]; then
 	echo "Press Ctrl+C to abort"
 	read; read; read
 fi
-if [ ! -d "$DIR" ]; then
-	echo "$DIR is not a directory to link to $WWW"
-	exit 1
-fi
 sudo rm "$WWW"
 sudo ln -s "$DIR" "$WWW"
+
+echo "$WWW -> $DIR"
