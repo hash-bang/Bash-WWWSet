@@ -16,27 +16,14 @@ else
 	exit 1
 fi
 
-# Resolve $DIR to its absolute name
-cd `dirname $DIR`
-TARGET=`basename $DIR`
-
-# Iterate down a (possible) chain of symlinks
-while [ -L "$TARGET" ]
-do
-    TARGET=`readlink $TARGET`
-    cd `dirname $TARGET`
-    TARGET=`basename $TARGET`
-done
- 
-# Compute the canonicalized name by finding the physical path 
-# for the directory we're in and appending the target file.
-PHYS_DIR=`pwd -P`
-DIR=$PHYS_DIR/$TARGET
+# Resolve $DIR to its absolute name (avoiding all symlinks)
+cd "$DIR"
+DIR=`pwd -P`
 
 if [ ! -h "$WWW" ]; then
 	echo "$WWW is not already a Symlink!"
 	echo
-	echo "This may just be because you have never run this script before - so its safe"
+	echo "This may just be because you have never run this script before OR that $WWW is a directory with actual contents"
 	echo
 	echo "Press enter THREE TIMES if you want to continue - YOU WILL LOSE ANYTHING IN $WWW"
 	echo "Press Ctrl+C to abort"
