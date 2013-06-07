@@ -28,8 +28,9 @@ if [ ! -h "$WWW" ]; then
 	echo "Press enter THREE TIMES if you want to continue - YOU WILL LOSE ANYTHING IN $WWW"
 	echo "Press Ctrl+C to abort"
 	read; read; read
+	sudo rm -r "$WWW"
 fi
-sudo rm "$WWW"
+sudo rm "$WWW" 2>/dev/null
 sudo ln -s "$DIR" "$WWW"
 
 echo "$WWW -> $DIR"
