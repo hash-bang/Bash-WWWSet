@@ -57,17 +57,18 @@ echo "Setting WWW directory to $DIR..."
 sudo rm "$WWW" 2>/dev/null
 sudo ln -s "$DIR" "$WWW"
 
+# Terminate Gulp if its running
+ps -C gulp >/dev/null 2>&1
+if [ "$?" == 0 ] ; then
+	echo "Terminating existing gulp process..."
+	killall gulp
+fi
+
 if [[ $NODE_GULP_DETECT == 1 && -e "gulpfile.js" ]]; then
 	ps -C apache2 >/dev/null 2>&1
 	if [ "$?" == 0 ]; then
 		echo "Terminating Apache..."
 		sudo service apache2 stop
-	fi
-
-	ps -C gulp >/dev/null 2>&1
-	if [ "$?" == 0 ] ; then
-		echo "Terminating existing gulp process..."
-		killall gulp
 	fi
 
 	echo "Starting gulp process inside screen 'gulp' - use `screen -x gulp` to view"
