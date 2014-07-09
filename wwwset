@@ -5,7 +5,15 @@
 #
 # If no dir is specified the current directory is used
 
+# Your Apache directory
 WWW=/var/www
+
+# Detect NodeJS Gulp style projects and stop apache if found
+NODE_DETECT_GULP=1
+
+# Refuse to reset the WWW directory if its already correctly set - this can be annoying if a subprocess needs restarting but can prevent accidental nukes of Node processes
+REFUSE_IF_SET=0
+
 
 if [ "$#" == 0 ]; then
 	DIR="$PWD"
@@ -30,7 +38,39 @@ if [ ! -h "$WWW" ]; then
 	read; read; read
 	sudo rm -r "$WWW"
 fi
+
+if [[ $REFUSE_IF_SET == 1 && `readlink "$WWW"` == "$DIR" ]]; then
+	echo "WWW directory is already set to $DIR"
+	exit 1
+fi
+
+echo "Setting WWW directory to $DIR..."
+
 sudo rm "$WWW" 2>/dev/null
 sudo ln -s "$DIR" "$WWW"
+
+if [[ $NODE_DETECT_GULP == 1 && -e "gulpfile.js" ]]; then
+	ps -C apache2 >/dev/null 2>&1
+	if [ "$?" == 0 ]; then
+		echo "Terminating Apache..."
+		sudo service apache2 stop
+	fi
+
+	ps -C gulp >/dev/null 2>&1
+	if [ "$?" == 0 ] ; then
+		echo "Terminating existing gulp process..."
+		killall gulp
+	fi
+
+	echo "Starting gulp process inside screen 'gulp' - use `screen -x gulp` to view"
+	screen -dmS gulp gulp
+else
+	# Assume this is a standard project that needs apache
+	ps -C apache2 >/dev/null 2>&1
+	if [ "$?" != 0 ]; then
+		echo "Apache not running, starting..."
+		sudo service apache2 start
+	fi
+fi
 
 echo "$WWW -> $DIR"
