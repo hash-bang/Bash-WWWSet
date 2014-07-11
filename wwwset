@@ -71,7 +71,6 @@ if [[ $NODE_GULP_DETECT == 1 && -e "gulpfile.js" ]]; then
 		sudo service apache2 stop
 	fi
 
-	echo "Starting gulp process inside screen 'gulp' - use `screen -x gulp` to view"
 	eval $NODE_GULP_COMMAND
 else
 	# Assume this is a standard project that needs apache
