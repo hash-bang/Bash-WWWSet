@@ -11,13 +11,6 @@ WWW=/var/www
 # Detect NodeJS Gulp style projects and stop apache if found
 NODE_GULP_DETECT=1
 
-# Ways to run gulp:
-
-# Uncomment this to run gulp inside a screen terminal
-# NODE_GULP_COMMAND="screen -dmS gulp gulp"
-# Uncomment this to run gulp inside a popup XFCE4 terminal
-NODE_GULP_COMMAND="xfce4-terminal --geometry -0-0 -x bash -ic 'gulp' &"
-
 # Refuse to reset the WWW directory if its already correctly set - this can be annoying if a subprocess needs restarting but can prevent accidental nukes of Node processes
 REFUSE_IF_SET=0
 
@@ -71,7 +64,14 @@ if [[ $NODE_GULP_DETECT == 1 && -e "gulpfile.js" ]]; then
 		sudo service apache2 stop
 	fi
 
-	eval $NODE_GULP_COMMAND
+	if [ -n "$COLORTERM" ]; then
+		echo "Running Gulp in new terminal Window"
+		eval "$COLORTERM --geometry -0-0 -x bash -ic 'gulp' &"
+	else
+		echo "Running Gulp inside screen session"
+		screen -dmS gulp gulp
+	fi
+
 else
 	# Assume this is a standard project that needs apache
 	ps -C apache2 >/dev/null 2>&1
