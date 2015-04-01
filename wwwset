@@ -14,6 +14,9 @@ NODE_GULP_DETECT=1
 # Refuse to reset the WWW directory if its already correctly set - this can be annoying if a subprocess needs restarting but can prevent accidental nukes of Node processes
 REFUSE_IF_SET=0
 
+# Options to pass to a spawned terminal session
+TERM_OPTS="--geometry -0-0 --profile=Log"
+
 # -----
 
 if [ "$#" == 0 ]; then
@@ -66,7 +69,7 @@ if [[ $NODE_GULP_DETECT == 1 && -e "gulpfile.js" ]]; then
 
 	if [ -n "$COLORTERM" ]; then
 		echo "Running Gulp in new terminal Window"
-		eval "$COLORTERM --geometry -0-0 -x bash -ic 'gulp' &"
+		eval "$COLORTERM $TERM_OPTS -x bash -ic 'gulp' &"
 	else
 		echo "Running Gulp inside screen session"
 		screen -dmS gulp gulp
