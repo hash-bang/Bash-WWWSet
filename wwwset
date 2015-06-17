@@ -15,9 +15,15 @@ NODE_GULP_DETECT=1
 REFUSE_IF_SET=0
 
 # Options to pass to a spawned terminal session
-TERM_OPTS="--geometry -0-0 --profile=Log"
+if [ "$COLORTERM" == "gnome-terminal" ]; then
+	TERM_OPTS="--geometry -0-0 --profile=Log"
+else
+	TERM_OPTS="--geometry -0-0"
+fi
 
 # -----
+
+MYDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 if [ "$#" == 0 ]; then
 	DIR="$PWD"
@@ -69,10 +75,10 @@ if [[ $NODE_GULP_DETECT == 1 && -e "gulpfile.js" ]]; then
 
 	if [ -n "$COLORTERM" ]; then
 		echo "Running Gulp in new terminal Window"
-		eval "$COLORTERM $TERM_OPTS -x bash -ic 'gulp' &"
+		eval "$COLORTERM $TERM_OPTS -x bash -ic '$MYDIR/helpers/gulp' &"
 	else
 		echo "Running Gulp inside screen session"
-		screen -dmS gulp gulp
+		screen -dmS gulp "$MYDIR/helpers/gulp"
 	fi
 
 else
