@@ -1,10 +1,8 @@
 #!/bin/bash
-# Run Gulp inside a container and reboot it if it dies
-while true; do
-	gulp
-	if [ "$?" != 0 ]; then
-		echo "Gulp exited with non-zero exit code $?"
-		echo "Press enter to reboot"
-		read
-	fi
-done
+# Run Gulp inside a container and notify if it dies
+gulp
+if [ "$?" != 0 ]; then
+	echo "Gulp exited with non-zero exit code $?"
+	echo "Press enter to exit"
+	read
+fi
